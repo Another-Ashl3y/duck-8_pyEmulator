@@ -43,7 +43,7 @@ for i in data:
             code_line.append(str(0).zfill(5))
             code_line.append(str(0).zfill(5))
         
-        if instruction == "owo":
+        if instruction == "goto":
             line = ""
             if arguments[1][0] == "#":
                 line = str(labels[arguments[1].replace("#","")])
@@ -53,7 +53,7 @@ for i in data:
             code_line.append(line)
             code_line.append(str(0))
             code_line.append(str(0))
-        if instruction == "owoZ":
+        if instruction == "goIfZ":
             line = ""
             if arguments[1][0] == "#":
                 line = str(labels[arguments[1].replace("#","")])

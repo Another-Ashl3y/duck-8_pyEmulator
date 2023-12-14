@@ -5,5 +5,5 @@ label LOOP
 inc .index
 raw 255 .index
 grt .index .end q
-owoZ #LOOP
-owo #START
+goIfZ #LOOP
+goto #START
