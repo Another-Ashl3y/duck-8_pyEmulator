@@ -498,7 +498,11 @@ for i in data:
             variables[c] = current_pos
             current_pos += 1
 
-
+        if instruction == "update":
+            code_line.append("24")
+            code_line.append("0")
+            code_line.append("0")
+            code_line.append("0")
         for x, j in enumerate(code_line):
             code_line[x] = str(j).zfill(5)
         print(len(code_line))

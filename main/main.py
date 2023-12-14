@@ -65,7 +65,6 @@ def main() -> str:
                 pygame.quit()
                 return "-- Emulator closed by user --"
 
-        pygame.display.update()
 
     return "-- Emulator closed --"
 

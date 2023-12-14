@@ -1,4 +1,4 @@
-import traceback
+import traceback, pygame
 class cpu:
     def __init__(self):
         f = [
@@ -8,7 +8,8 @@ class cpu:
             NOT,ORR,AND,XOR,
             EQU,GRT,LES,
             STO,STI,STQ,STR,STT,MOV,
-            JMP,JMZ,JMC
+            JMP,JMZ,JMC,
+            UPD
         ]
         self.functions = {}
         docs = []
@@ -31,7 +32,7 @@ class cpu:
         print("--------------------------------------------")
 
     def tick(self):
-        print(int(self.MEMORY[1025],2))
+        # print(int(self.MEMORY[1025],2))
         instruction = self.MEMORY[int(self.program_counter,2)+0]
         arg0 = self.MEMORY[int(self.program_counter,2)+1]
         arg1 = self.MEMORY[int(self.program_counter,2)+2]
@@ -153,3 +154,5 @@ def PAS(this:cpu,a,b,c):
     pass
 def next_instruction(this:cpu):
     this.program_counter = format_binary(int(this.program_counter,2)+4, 16)
+def UPD(this:cpu,_a,_b,_c):
+    pygame.display.update()
