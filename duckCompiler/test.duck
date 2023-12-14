@@ -1,10 +1,15 @@
 label START
+
 var end 65535
 var index 61439
+
 label LOOP
+
 inc .index
 raw 255 .index
 update
+
 grt .index .end q
 goIfZ #LOOP
+
 goto #START

@@ -497,7 +497,6 @@ for i in data:
             code_line.append(str(current_pos))
             variables[c] = current_pos
             current_pos += 1
-
         if instruction == "update":
             code_line.append("24")
             code_line.append("0")

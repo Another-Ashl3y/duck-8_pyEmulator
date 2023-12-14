@@ -40,6 +40,7 @@ def main() -> str:
         CPU.MEMORY[x] = i.strip()
 
     while CPU.alive:
+        MONITOR.fill((0,0,0))
         # Draw from memory 
         for i in range(61440, 65536, 1):
             x = (i-61440) % 64
