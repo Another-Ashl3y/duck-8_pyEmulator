@@ -124,7 +124,10 @@ def STI(this:cpu,a,b,_):
         data = f.read().split("\n")
         data[int(b,2)] = this.MEMORY[int(a,2)]
     with open("hardware/harddrive.hdw","w") as f:
-        f.writelines(data)
+        q = ""
+        for i in data:
+            q += i+"\n"
+        f.write(q.strip())
 def STQ(this:cpu,a,_0,_1):
     this.MEMORY[int(a,2)] = this.alu
 def HLT(this:cpu,_0,_1,_2):

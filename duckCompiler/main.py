@@ -65,9 +65,29 @@ for i in data:
             code_line.append(str(0))
 
         if instruction == "save":
-            pass
+            a = arguments[1]
+            if a[0] == ".": # Check if location exists
+                a = str(variables[a.replace(".","")])
+            else: # No location to access so create one
+                code_line.append("00018")
+                code_line.append(str(arguments[1]).zfill(5))
+                code_line.append(str(current_pos).zfill(5))
+                code_line.append(str(0).zfill(5))
+                a = str(current_pos)
+                current_pos += 1
+                offset += 1
+            
+            code_line.append("00016")
+            code_line.append(str(a).zfill(5))
+            code_line.append(str(arguments[2]).zfill(5))
+            code_line.append(str(0).zfill(5))
         if instruction == "load":
-            pass
+            code_line.append("00015")
+            code_line.append(str(arguments[1]).zfill(5))
+            code_line.append(str(current_pos).zfill(5))
+            code_line.append(str(0).zfill(5))
+            variables[arguments[2]] = current_pos
+            current_pos += 1
         if instruction == "raw":
             v = arguments[1]
             a = arguments[2]

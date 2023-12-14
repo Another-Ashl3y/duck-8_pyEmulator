@@ -1,8 +1,9 @@
 label START
 var end 65535
-var index 61439
+load 0 index
 label LOOP
 inc .index
+save .index 0
 raw 255 .index
 grt .index .end q
 goIfZ #LOOP
