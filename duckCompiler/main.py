@@ -22,10 +22,13 @@ def num_of_lines(x):
     return q
 
 for i in data:
+    if current_pos > 61438:
+        print("Max memory used")
+        break
     if i:
         code_line = []
         arguments = i.split(" ")
-        print(arguments)
+        # print(arguments)
         
         instruction = arguments[0]
         if instruction == "var":
@@ -502,6 +505,90 @@ for i in data:
             code_line.append("0")
             code_line.append("0")
             code_line.append("0")
+        if instruction == "for":
+            start = arguments[1]
+            end = arguments[2]
+            name = arguments[3]
+            if start[0] == ".":
+                addr = variables[start.replace(".","")]
+                code_line += [
+                    "20",
+                    addr,
+                    current_pos,
+                    "0"
+                ]
+                variables[name+":min"] = current_pos
+                current_pos += 1
+                code_line+=[
+                    "20",
+                    addr,
+                    current_pos,
+                    "0"
+                ]
+                variables[name+":index"] = current_pos
+                current_pos += 1
+            else:
+                v = start
+                code_line += [
+                    "18",
+                    v,
+                    current_pos,
+                    "0"
+                ]
+                variables[name+":min"] = current_pos
+                current_pos += 1
+                code_line+=[
+                    "18",
+                    v,
+                    current_pos,
+                    "0"
+                ]
+                variables[name+":index"] = current_pos
+                current_pos += 1
+
+            
+            if end[0] == ".":
+                addr = variables[end.replace(".","")]
+                code_line += [
+                    "20",
+                    addr,
+                    current_pos,
+                    "0"
+                ]
+            else:
+                v = end
+                code_line += [
+                    "18",
+                    v,
+                    current_pos,
+                    "0"
+                ]
+            variables[name+":max"] = current_pos
+            current_pos += 1
+            labels[name] = num_of_lines(output)+(4*3)
+            code_line += ["0","0","0","0"]
+        if instruction == "endfor":
+            name = arguments[1]
+            code_line += [
+                "06",
+                variables[name+":index"],
+                "00",
+                "00",
+
+                "13",
+                variables[name+":index"],
+                variables[name+":max"],
+                current_pos,
+                
+                "22",
+                labels[name],
+                "0",
+                "0"
+            ]
+
+
+
+        
         for x, j in enumerate(code_line):
             code_line[x] = str(j).zfill(5)
         print(len(code_line))

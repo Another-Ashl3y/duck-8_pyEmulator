@@ -32,7 +32,10 @@ class cpu:
         print("--------------------------------------------")
 
     def tick(self):
-        # print(int(self.MEMORY[1025],2))
+
+        pygame.display.update()
+        
+        print(int(self.MEMORY[1025],2))
         instruction = self.MEMORY[int(self.program_counter,2)+0]
         arg0 = self.MEMORY[int(self.program_counter,2)+1]
         arg1 = self.MEMORY[int(self.program_counter,2)+2]

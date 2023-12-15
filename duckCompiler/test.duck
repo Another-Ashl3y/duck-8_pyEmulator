@@ -1,25 +1,7 @@
-//label START
-
-//var end 65535
-//var index 61439
-
-//label LOOP
-
-//inc .index
-//raw 255 .index
-//update
-
-//grt .index .end q
-//goIfZ #LOOP
-
-//goto #START
-
-label START
-var point 61440
-raw 255 .point
-inc .point
-raw 255 .point
-inc .point
-raw 255 .point
-update
-goto #START
+label start
+var monitor_start 61439
+var monitor_end 65535
+for .monitor_start .monitor_end main
+raw 255 .main:index
+endfor main
+goto #start
