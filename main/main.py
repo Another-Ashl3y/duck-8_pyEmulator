@@ -27,7 +27,7 @@ def main() -> str:
                         print(f"| {instruct.__name__} |")
                     except KeyError:
                         return "faulty instruction at line: " + str(i)
-                print(f"{str(i).format().zfill(5)} | {data[i]} |")
+                print(f"{str(i).format().zfill(5)} | {data[i]} | {int(data[i],2)}")
                 CPU.MEMORY[i] = data[i]
                 
             else:

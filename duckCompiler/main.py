@@ -1,3 +1,4 @@
+import traceback
 file = input("File to compile -> ")
 with open(file,"r") as f:
     data = f.read().strip().splitlines()
@@ -31,8 +32,19 @@ for i in data:
         # print(arguments)
         
         instruction = arguments[0]
+        if instruction == "mutate":
+            var = arguments[1]
+            value = arguments[2]
+            if value[0] == ".":
+                value = variables[value.replace(".","")]
+            code_line += [
+                "18",
+                str(value),
+                str(variables[var]),
+                "0"
+            ]
         if instruction == "var":
-            code_line.append("00018")
+            code_line.append("18")
             code_line.append(str(arguments[2]).zfill(5))
             code_line.append(str(current_pos).zfill(5))
             code_line.append(str(0).zfill(5))
@@ -49,7 +61,10 @@ for i in data:
         if instruction == "goto":
             line = ""
             if arguments[1][0] == "#":
-                line = str(labels[arguments[1].replace("#","")])
+                if arguments[1].replace("#","") in labels:
+                    line = str(labels[arguments[1].replace("#","")])
+                else:
+                    line = arguments[1].replace("#","")
             else:
                 line = arguments[1]
             code_line.append("00021")
@@ -59,7 +74,10 @@ for i in data:
         if instruction == "goIfZ":
             line = ""
             if arguments[1][0] == "#":
-                line = str(labels[arguments[1].replace("#","")])
+                if arguments[1].replace("#","") in labels:
+                    line = str(labels[arguments[1].replace("#","")])
+                else:
+                    line = arguments[1].replace("#","")
             else:
                 line = arguments[1]
             code_line.append("22")
@@ -110,7 +128,35 @@ for i in data:
             code_line.append(str(v).zfill(5))
             code_line.append(str(a).zfill(5))
             code_line.append(str(0).zfill(5))
-
+        if instruction == "copy":
+            v = arguments[1]
+            a = arguments[2]
+            if a[0] == ".": # Check if location exists
+                a = str(variables[a.replace(".","")])
+            else: # No location to access so create one
+                code_line.append("00018")
+                code_line.append(str(arguments[1]).zfill(5))
+                code_line.append(str(current_pos).zfill(5))
+                code_line.append(str(0).zfill(5))
+                a = str(current_pos)
+                current_pos += 1
+                offset += 1
+            if v[0] == ".": # Check if location exists
+                v = str(variables[v.replace(".","")])
+            else: # No location to access so create one
+                code_line.append("00018")
+                code_line.append(str(arguments[1]).zfill(5))
+                code_line.append(str(current_pos).zfill(5))
+                code_line.append(str(0).zfill(5))
+                v = str(current_pos)
+                current_pos += 1
+                offset += 1
+            code_line += [
+                "20",
+                v,
+                a,
+                "0"
+            ]
         if instruction == "add":
             offset = 0
             a = arguments[1]
@@ -137,13 +183,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("2")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "sub":
             offset = 0
             a = arguments[1]
@@ -170,13 +220,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("3")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "mul":
             offset = 0
             a = arguments[1]
@@ -203,14 +257,18 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("4")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
-        if instruction == "add":
+            code_line.append(c)
+        if instruction == "div":
             offset = 0
             a = arguments[1]
             b = arguments[2]
@@ -236,13 +294,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("5")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "inc":
             offset = 0
             a = arguments[1]
@@ -295,13 +357,17 @@ for i in data:
                 a = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if b[0] == ".":
+                b = str(variables[b.replace(".","")])
+            else:
+                variables[b] = current_pos
+                b = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("5")
             code_line.append(a)
-            code_line.append(str(current_pos))
+            code_line.append(b)
             code_line.append(str(0))
-            variables[b] = current_pos
-            current_pos += 1
         if instruction == "orr":
             offset = 0
             a = arguments[1]
@@ -328,13 +394,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("9")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "and":
             offset = 0
             a = arguments[1]
@@ -361,13 +431,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("10")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "xor":
             offset = 0
             a = arguments[1]
@@ -394,13 +468,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("11")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "equ":
             offset = 0
             a = arguments[1]
@@ -427,13 +505,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("12")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "grt":
             offset = 0
             a = arguments[1]
@@ -460,13 +542,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("13")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "les":
             offset = 0
             a = arguments[1]
@@ -493,13 +579,17 @@ for i in data:
                 b = str(current_pos)
                 current_pos += 1
                 offset += 1
+            if c[0] == ".":
+                c = str(variables[c.replace(".","")])
+            else:
+                variables[c] = current_pos
+                c = str(current_pos)
+                current_pos+=1
             current_pos -= offset
             code_line.append("14")
             code_line.append(a)
             code_line.append(b)
-            code_line.append(str(current_pos))
-            variables[c] = current_pos
-            current_pos += 1
+            code_line.append(c)
         if instruction == "update":
             code_line.append("24")
             code_line.append("0")
@@ -567,20 +657,21 @@ for i in data:
             current_pos += 1
             labels[name] = num_of_lines(output)+(4*3)
             code_line += ["0","0","0","0"]
+            # print(code_line)
         if instruction == "endfor":
             name = arguments[1]
             code_line += [
-                "06",
+                "06", # Increment value
                 variables[name+":index"],
                 "00",
                 "00",
 
-                "13",
+                "13", # Compare index with max
                 variables[name+":index"],
                 variables[name+":max"],
                 current_pos,
                 
-                "22",
+                "22", 
                 labels[name],
                 "0",
                 "0"
@@ -591,15 +682,21 @@ for i in data:
         
         for x, j in enumerate(code_line):
             code_line[x] = str(j).zfill(5)
+            # print(j)
         print(len(code_line))
         output.append(code_line)
+
 
 with open("compiledCode.hdw","w") as f:
     print(variables)
     print(labels)
     q = ""
-    for x in output:
-        print(x)
-        for y in x:
-            q += "{0:b}".format(int(y)).zfill(16) + "\n"
+    for x, i in enumerate(output):
+        for y, j in enumerate(i):
+            print(j)
+            try:
+                q += "{0:b}".format(int(j)).zfill(16) + "\n"
+            except ValueError as e:
+                print(j,int(labels[j]))
+                q += "{0:b}".format(int(labels[j])).zfill(16) + "\n"
     f.write(q.strip())

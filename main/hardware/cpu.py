@@ -32,16 +32,25 @@ class cpu:
         print("--------------------------------------------")
 
     def tick(self):
-
-        pygame.display.update()
-        
-        print(int(self.MEMORY[1025],2))
+        # print("BLACK:INDEX:",int(self.MEMORY[1030],2))
+        # print("WHITE:INDEX:",int(self.MEMORY[1033],2))
+        # print("BLACK:MIN:",int(self.MEMORY[1029],2))
+        # # pygame.display.update()
+        # print(int(self.program_counter,2))
+        # print(int(self.MEMORY[1026],2),
+        # int(self.MEMORY[61439],2),
+        # int(self.MEMORY[61503],2),
+        # int(self.MEMORY[1032],2),
+        # int(self.MEMORY[1035],2),
+        # int(self.alu,2)
+        # )
         instruction = self.MEMORY[int(self.program_counter,2)+0]
         arg0 = self.MEMORY[int(self.program_counter,2)+1]
         arg1 = self.MEMORY[int(self.program_counter,2)+2]
         arg3 = self.MEMORY[int(self.program_counter,2)+3]
         # print(instruction)
         try:
+            # print(self.functions[instruction].__name__)
             q = self.functions[instruction](self, arg0, arg1, arg3)
             if not(q):
                 next_instruction(self)
@@ -100,25 +109,28 @@ def XOR(this:cpu,a,b,c):
         ) or int(this.MEMORY[int(b,2)],2) > 0 and not(int(this.MEMORY[int(a,2)],2) > 0):
         q = 1
     this.MEMORY[int(c,2)] = format_binary(q,16)
-    this.alu = format_binary(1,16)
+    this.alu = format_binary(q,16)
 def EQU(this:cpu,a,b,c):
     q = 0
-    if int(this.MEMORY[int(a,2)],2) > 0 == int(this.MEMORY[int(b,2)],2) > 0:
+    if int(this.MEMORY[int(a,2)],2) == int(this.MEMORY[int(b,2)],2):
         q = 1
     this.MEMORY[int(c,2)] = format_binary(q,16)
-    this.alu = format_binary(1,16)
+    this.alu = format_binary(q,16)
+    # print("EQU:",int(this.alu,2), this.MEMORY[int(a,2)], this.MEMORY[int(b,2)])
 def GRT(this:cpu,a,b,c):
     q = 0
     if int(this.MEMORY[int(a,2)],2) > int(this.MEMORY[int(b,2)],2):
         q = 1
     this.MEMORY[int(c,2)] = format_binary(q,16)
     this.alu = format_binary(q,16)
+    print("GRT:",int(this.alu,2),int(this.MEMORY[int(a,2)],2),int(this.MEMORY[int(b,2)],2))
 def LES(this:cpu,a,b,c):
     q = 0
     if int(this.MEMORY[int(a,2)],2) < int(this.MEMORY[int(b,2)],2):
         q = 1
     this.MEMORY[int(c,2)] = format_binary(q,16)
-    this.alu = format_binary(1,16)
+    this.alu = format_binary(q,16)
+    print("LES:",int(this.alu,2),int(this.MEMORY[int(a,2)],2),int(this.MEMORY[int(b,2)],2))
 def STO(this:cpu,a,b,_):
     with open("hardware/harddrive.hdw","r") as f:
         data = f.read().split("\n")
@@ -141,8 +153,9 @@ def JMP(this:cpu,a,_0,_1):
     return 1
 def JMZ(this:cpu,a,_0,_1):
     if int(this.alu,2) == 0:
+        # print(int(a,2),int(this.alu,2))
         this.program_counter = format_binary(int(a,2),16)
-    return 1
+        return 1
 def JMC(this:cpu,a,_0,_1):
     if int(this.alu,2) == 0:
         this.program_counter = format_binary(int(a,2),16)
